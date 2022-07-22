@@ -239,6 +239,30 @@ class StatusPacket(GenericWSJTXPacket):
                                                                                                                   self.sub_mode, self.fast_mode, self.special_op_mode)
         return str
 
+    @classmethod
+    def Builder(cls, wsjtx_id='pywsjtx', dial_frequency=0, mode='', dx_call='', report='', tx_mode='', tx_enabled=0, transmitting=0, decoding=0, rx_df=0, tx_df=0, de_call='', de_grid='', dx_grid='', tx_watchdog=0, sub_mode='', fast_mode=0, special_op_mode='Default'):
+        pkt = PacketWriter()
+        pkt.write_QInt32(StatusPAcket.TYPE_VALUE)
+        pkt.write_QString(wsjtx_id)
+        pkt.write_QInt32(dial_frequency)
+        pkt.write_QString(mode)
+        pkt.write_QString(dx_call)
+        pkt.write_QString(report)
+        pkt.write_QString(tx_mode)
+        pkt.write_QInt8(tx_enabled)
+        pkt.write_QInt8(transmitting)
+        pkt.write_QInt8(decoding)
+        pkt.write_QInt32(rx_df)
+        pkt.write_QInt32(tx_df)
+        pkt.write_QString(de_call)
+        pkt.write_QString(de_grid)
+        pkt.write_QString(dx_grid)
+        pkt.write_QInt8(tx_watchdog)
+        pkt.write_QString(sub_mode)
+        pkt.write_QInt8(fast_mode)
+        pkt.write_QString(special_op_mode)
+        return pkt.packet
+
 
 class DecodePacket(GenericWSJTXPacket):
     TYPE_VALUE = 2
@@ -259,6 +283,7 @@ class DecodePacket(GenericWSJTXPacket):
         self.low_confidence = ps.QInt8()
         self.off_air = ps.QInt8()
 
+
     def __repr__(self):
         str = 'DecodePacket: from {}:{}\n\twsjtx id:{}\tmessage:{}\n'.format(self.addr_port[0],
                                                                                          self.addr_port[1],
@@ -271,6 +296,21 @@ class DecodePacket(GenericWSJTXPacket):
                                                                                                 self.delta_f,
                                                                                                 self.mode)
         return str
+
+    @classmethod
+    def Builder(cls, wsjtx_id='pywsjtx', new_decode=1, millis_since_midnight=0, snr=0, delta_t=0, delta_f=0, mode='', message='', low_confidence=0):
+        pkt = PacketWriter()
+        pkt.write_QInt32(DecodePacket.TYPE_VALUE)
+        pkt.write_QString(wsjtx_id)
+        pkt.write_QInt8(new_decode)
+        pkt.write_QInt32(millis_since_midnight)
+        pkt.write_QInt32(snr)
+        pkt.write_QFloat(delta_t)
+        pkt.write_QInt32(delta_f)
+        pkt.write_QString(mode)
+        pkt.write_QString(message)
+        pkt.write_QInt8(low_confidence)
+        return pkt.packet
 
 class ClearPacket(GenericWSJTXPacket):
     TYPE_VALUE = 3
