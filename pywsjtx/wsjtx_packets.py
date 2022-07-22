@@ -242,7 +242,7 @@ class StatusPacket(GenericWSJTXPacket):
     @classmethod
     def Builder(cls, wsjtx_id='pywsjtx', dial_frequency=0, mode='', dx_call='', report='', tx_mode='', tx_enabled=0, transmitting=0, decoding=0, rx_df=0, tx_df=0, de_call='', de_grid='', dx_grid='', tx_watchdog=0, sub_mode='', fast_mode=0, special_op_mode='Default'):
         pkt = PacketWriter()
-        pkt.write_QInt32(StatusPAcket.TYPE_VALUE)
+        pkt.write_QInt32(StatusPacket.TYPE_VALUE)
         pkt.write_QString(wsjtx_id)
         pkt.write_QInt32(dial_frequency)
         pkt.write_QString(mode)
