@@ -240,11 +240,11 @@ class StatusPacket(GenericWSJTXPacket):
         return str
 
     @classmethod
-    def Builder(cls, wsjtx_id='pywsjtx', dial_frequency=0, mode='', dx_call='', report='', tx_mode='', tx_enabled=0, transmitting=0, decoding=0, rx_df=0, tx_df=0, de_call='', de_grid='', dx_grid='', tx_watchdog=0, sub_mode='', fast_mode=0, special_op_mode='Default'):
+    def Builder(cls, wsjtx_id='pywsjtx', dial_frequency=0, mode='', dx_call='', report='', tx_mode='', tx_enabled=0, transmitting=0, decoding=0, rx_df=0, tx_df=0, de_call='', de_grid='', dx_grid='', tx_watchdog=0, sub_mode='', fast_mode=0, special_op_mode=0):
         pkt = PacketWriter()
         pkt.write_QInt32(StatusPacket.TYPE_VALUE)
         pkt.write_QString(wsjtx_id)
-        pkt.write_QInt32(dial_frequency)
+        pkt.write_QInt64(dial_frequency)
         pkt.write_QString(mode)
         pkt.write_QString(dx_call)
         pkt.write_QString(report)
@@ -260,7 +260,7 @@ class StatusPacket(GenericWSJTXPacket):
         pkt.write_QInt8(tx_watchdog)
         pkt.write_QString(sub_mode)
         pkt.write_QInt8(fast_mode)
-        pkt.write_QString(special_op_mode)
+        pkt.write_QInt8(special_op_mode)
         return pkt.packet
 
 
@@ -298,7 +298,7 @@ class DecodePacket(GenericWSJTXPacket):
         return str
 
     @classmethod
-    def Builder(cls, wsjtx_id='pywsjtx', new_decode=1, millis_since_midnight=0, snr=0, delta_t=0, delta_f=0, mode='', message='', low_confidence=0):
+    def Builder(cls, wsjtx_id='pywsjtx', new_decode=1, millis_since_midnight=0, snr=0, delta_t=0, delta_f=0, mode='', message='', low_confidence=0, off_air=0):
         pkt = PacketWriter()
         pkt.write_QInt32(DecodePacket.TYPE_VALUE)
         pkt.write_QString(wsjtx_id)
@@ -310,6 +310,7 @@ class DecodePacket(GenericWSJTXPacket):
         pkt.write_QString(mode)
         pkt.write_QString(message)
         pkt.write_QInt8(low_confidence)
+        pkt.write_QInt8(off_air)
         return pkt.packet
 
 class ClearPacket(GenericWSJTXPacket):
