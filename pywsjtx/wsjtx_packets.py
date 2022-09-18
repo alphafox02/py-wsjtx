@@ -63,7 +63,9 @@ class PacketWriter(object):
         self.packet.extend(struct.pack('>d', val))
 
     def write_QString(self, str_val):
-
+        if len(str_val) == 0:
+            self.packet.extend(b'\xff\xff\xff\xff')
+            return # this is how wsjtx formats empty strings
         b_values = str_val
         if type(str_val) != bytes:
             b_values = str_val.encode()
@@ -179,22 +181,22 @@ class HeartBeatPacket(GenericWSJTXPacket):
         the_type = ps.QInt32()
         self.wsjtx_id = ps.QString()
         self.max_schema = ps.QInt32()
-        self.version = ps.QInt8()
-        self.revision = ps.QInt8()
+        self.version = ps.QString()
+        self.revision = ps.QString()
 
     def __repr__(self):
         return 'HeartBeatPacket: from {}:{}\n\twsjtx id:{}\tmax_schema:{}\tschema:{}\tversion:{}\trevision:{}' .format(self.addr_port[0], self.addr_port[1],
                                                                                                       self.wsjtx_id, self.max_schema, self.schema, self.version, self.revision)
     @classmethod
     # make a heartbeat packet (a byte array) we can send to a 'client'. This should be it's own class.
-    def Builder(cls,wsjtx_id='pywsjtx', max_schema=2, version=1, revision=1):
+    def Builder(cls,wsjtx_id='pywsjtx', max_schema=2, version='2.5.4', revision='0000'):
         # build the packet to send
         pkt = PacketWriter()
         pkt.write_QInt32(HeartBeatPacket.TYPE_VALUE)
         pkt.write_QString(wsjtx_id)
         pkt.write_QInt32(max_schema)
-        pkt.write_QInt32(version)
-        pkt.write_QInt32(revision)
+        pkt.write_QString(version)
+        pkt.write_QString(revision)
         return pkt.packet
 
 class StatusPacket(GenericWSJTXPacket):
@@ -218,18 +220,20 @@ class StatusPacket(GenericWSJTXPacket):
         self.rx_df = ps.QInt32()
         self.tx_df = ps.QInt32()
 
-
         self.de_call = ps.QString()
 
         self.de_grid = ps.QString()
         self.dx_grid = ps.QString()
 
-        self.tx_watchdog = ps.QInt8()
+        self.tx_watchdog = ps.QInt8() # this is a boolean
         self.sub_mode = ps.QString()
         self.fast_mode = ps.QInt8()
-
-        # new in wsjtx-2.0.0
         self.special_op_mode = ps.QInt8()
+        self.freq_tolerance = ps.QInt32()
+        self.tr_period = ps.QInt32()
+
+        self.config_name = ps.QString()
+        self.tx_message = ps.QString()
 
     def __repr__(self):
         str =  'StatusPacket: from {}:{}\n\twsjtx id:{}\tde_call:{}\tde_grid:{}\n'.format(self.addr_port[0], self.addr_port[1],self.wsjtx_id,
@@ -240,7 +244,7 @@ class StatusPacket(GenericWSJTXPacket):
         return str
 
     @classmethod
-    def Builder(cls, wsjtx_id='pywsjtx', dial_frequency=0, mode='', dx_call='', report='', tx_mode='', tx_enabled=0, transmitting=0, decoding=0, rx_df=0, tx_df=0, de_call='', de_grid='', dx_grid='', tx_watchdog=0, sub_mode='', fast_mode=0, special_op_mode=0):
+    def Builder(cls, wsjtx_id='pywsjtx', dial_frequency=0, mode='', dx_call='', report='', tx_mode='', tx_enabled=0, transmitting=0, decoding=0, rx_df=0, tx_df=0, de_call='', de_grid='', dx_grid='', tx_watchdog=0, sub_mode='', fast_mode=0, special_op_mode=0, freq_tolerance=0, tr_period=0, config_name='', tx_message=''):
         pkt = PacketWriter()
         pkt.write_QInt32(StatusPacket.TYPE_VALUE)
         pkt.write_QString(wsjtx_id)
@@ -261,6 +265,10 @@ class StatusPacket(GenericWSJTXPacket):
         pkt.write_QString(sub_mode)
         pkt.write_QInt8(fast_mode)
         pkt.write_QInt8(special_op_mode)
+        pkt.write_QInt32(freq_tolerance)
+        pkt.write_QInt32(tr_period)
+        pkt.write_QString(config_name)
+        pkt.write_QString(tx_message)
         return pkt.packet
 
 
@@ -337,7 +345,7 @@ class ClosePacket(GenericWSJTXPacket):
         GenericWSJTXPacket.__init__(self, addr_port, magic, schema, pkt_type, id, pkt)
         # handle packet-specific stuff.
 
-class ReplayPacket(GenericWSJTXPacket):
+class ReplyPacket(GenericWSJTXPacket):
     TYPE_VALUE = 7
     def __init__(self, addr_port, magic, schema, pkt_type, id, pkt):
         GenericWSJTXPacket.__init__(self, addr_port, magic, schema, pkt_type, id, pkt)
@@ -432,7 +440,7 @@ class WSJTXPacketClassFactory(GenericWSJTXPacket):
         ReplyPacket.TYPE_VALUE:    ReplyPacket,
         QSOLoggedPacket.TYPE_VALUE: QSOLoggedPacket,
         ClosePacket.TYPE_VALUE:     ClosePacket,
-        ReplayPacket.TYPE_VALUE:    ReplayPacket,
+        ReplyPacket.TYPE_VALUE:    ReplyPacket,
         HaltTxPacket.TYPE_VALUE:    HaltTxPacket,
         FreeTextPacket.TYPE_VALUE:  FreeTextPacket,
         WSPRDecodePacket.TYPE_VALUE: WSPRDecodePacket
