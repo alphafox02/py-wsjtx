@@ -345,7 +345,7 @@ class ClosePacket(GenericWSJTXPacket):
         GenericWSJTXPacket.__init__(self, addr_port, magic, schema, pkt_type, id, pkt)
         # handle packet-specific stuff.
 
-class ReplyPacket(GenericWSJTXPacket):
+class ReplayPacket(GenericWSJTXPacket):
     TYPE_VALUE = 7
     def __init__(self, addr_port, magic, schema, pkt_type, id, pkt):
         GenericWSJTXPacket.__init__(self, addr_port, magic, schema, pkt_type, id, pkt)
@@ -440,7 +440,7 @@ class WSJTXPacketClassFactory(GenericWSJTXPacket):
         ReplyPacket.TYPE_VALUE:    ReplyPacket,
         QSOLoggedPacket.TYPE_VALUE: QSOLoggedPacket,
         ClosePacket.TYPE_VALUE:     ClosePacket,
-        ReplyPacket.TYPE_VALUE:    ReplyPacket,
+        ReplayPacket.TYPE_VALUE:    ReplayPacket,
         HaltTxPacket.TYPE_VALUE:    HaltTxPacket,
         FreeTextPacket.TYPE_VALUE:  FreeTextPacket,
         WSPRDecodePacket.TYPE_VALUE: WSPRDecodePacket
