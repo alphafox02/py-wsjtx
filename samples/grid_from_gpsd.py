@@ -75,9 +75,9 @@ class WSJTXManager:
                 if isinstance(the_packet, pywsjtx.StatusPacket):
                     if self.gps_grid != "" and the_packet.de_grid != self.gps_grid:
                         print("Sending Grid Change to wsjtx-x, old grid:{} new grid: {}".format(the_packet.de_grid,
-                                                                                                self.gps_grid))
+                                                                                                str(self.gps_grid).upper()))
                         grid_change_packet = pywsjtx.LocationChangePacket.Builder(self.wsjtx_id,
-                                                                                  "GRID:" + self.gps_grid)
+                                                                                  "GRID:" + str(self.gps_grid).upper())
                         s.send_packet(addr_port, grid_change_packet)
 
                 print(the_packet)
